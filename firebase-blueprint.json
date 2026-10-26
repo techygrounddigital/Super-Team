@@ -1,0 +1,150 @@
+{
+  "entities": {
+    "quizState": {
+      "title": "Quiz State",
+      "description": "Global state of the live quiz controlled by the host",
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["lobby", "question", "closed", "reveal", "ended"]
+        },
+        "currentQuestionId": {
+          "type": "string",
+          "description": "ID of current active question"
+        },
+        "questionOpenedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when current question was opened"
+        },
+        "timeLimit": {
+          "type": "number",
+          "description": "Countdown duration in seconds"
+        },
+        "revealedAnswer": {
+          "type": "string",
+          "description": "Correct answer shown once reveal is triggered"
+        },
+        "bonusRoundCount": {
+          "type": "number",
+          "description": "1 for single fastest winner or 3 for top 3 bonus winners"
+        },
+        "practiceMode": {
+          "type": "boolean",
+          "description": "Whether current question is a practice question"
+        },
+        "answersCount": {
+          "type": "number",
+          "description": "Total answers received for active question"
+        },
+        "oneGiftPerPerson": {
+          "type": "boolean",
+          "description": "Whether past winners are skipped for new prizes"
+        }
+      },
+      "required": ["status"]
+    },
+    "question": {
+      "title": "Question",
+      "description": "Public question record for the audience and players",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "type": { "type": "string", "enum": ["multiple_choice", "typed"] },
+        "options": { "type": "array" },
+        "timeLimit": { "type": "number" },
+        "prizeName": { "type": "string" },
+        "order": { "type": "number" },
+        "practice": { "type": "boolean" }
+      },
+      "required": ["id", "text", "type", "timeLimit", "prizeName", "order"]
+    },
+    "answerKey": {
+      "title": "Answer Key",
+      "description": "Host only secret answer key containing correct answer and accepted spellings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "correctAnswer": { "type": "string" },
+        "acceptedAlternatives": { "type": "array" }
+      },
+      "required": ["id", "correctAnswer"]
+    },
+    "player": {
+      "title": "Player",
+      "description": "Audience participant details with phone and winning status",
+      "type": "object",
+      "properties": {
+        "playerId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 25 },
+        "joinedAt": { "type": "string", "format": "date-time" },
+        "hasWon": { "type": "boolean" },
+        "banned": { "type": "boolean" }
+      },
+      "required": ["playerId", "name", "phone"]
+    },
+    "answerEntry": {
+      "title": "Answer Entry",
+      "description": "Player answer submission with server and client timestamps",
+      "type": "object",
+      "properties": {
+        "playerId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 25 },
+        "answer": { "type": "string", "maxLength": 200 },
+        "submittedAt": { "type": "string", "format": "date-time" },
+        "clientMs": { "type": "number" },
+        "isCorrect": { "type": "boolean" }
+      },
+      "required": ["playerId", "name", "phone", "answer"]
+    },
+    "winnerRecord": {
+      "title": "Winner Record",
+      "description": "Confirmed winner entry with verification claim code",
+      "type": "object",
+      "properties": {
+        "questionId": { "type": "string" },
+        "playerId": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "prize": { "type": "string" },
+        "timeMs": { "type": "number" },
+        "claimCode": { "type": "string" },
+        "collected": { "type": "boolean" },
+        "rank": { "type": "number" },
+        "disqualified": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["questionId", "playerId", "name", "phone", "prize", "claimCode"]
+    }
+  },
+  "firestore": {
+    "/quiz/{stateId}": {
+      "schema": { "$ref": "#/entities/quizState" },
+      "description": "Global state document for the live quiz system"
+    },
+    "/questions/{questionId}": {
+      "schema": { "$ref": "#/entities/question" },
+      "description": "Public quiz questions without correct answers"
+    },
+    "/answerKeys/{questionId}": {
+      "schema": { "$ref": "#/entities/answerKey" },
+      "description": "Confidential host only answer keys and accepted alternatives"
+    },
+    "/players/{playerId}": {
+      "schema": { "$ref": "#/entities/player" },
+      "description": "Registered player profiles with phone numbers"
+    },
+    "/answers/{questionId}/entries/{playerId}": {
+      "schema": { "$ref": "#/entities/answerEntry" },
+      "description": "Submissions for a specific question keyed by player ID"
+    },
+    "/winners/{winnerId}": {
+      "schema": { "$ref": "#/entities/winnerRecord" },
+      "description": "Confirmed prize winners and claim codes"
+    }
+  }
+}

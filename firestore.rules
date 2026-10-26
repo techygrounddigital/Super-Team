@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global state for live quiz: public read and write
+    match /quiz/{stateId} {
+      allow read, write: if true;
+    }
+
+    // Questions: public read and write
+    match /questions/{questionId} {
+      allow read, write: if true;
+    }
+
+    // Confidential answer keys
+    match /answerKeys/{questionId} {
+      allow read, write: if true;
+    }
+
+    // Registered player profiles
+    match /players/{playerId} {
+      allow read, write: if true;
+    }
+
+    // Player answers per question
+    match /answers/{questionId}/entries/{playerId} {
+      allow read, write: if true;
+    }
+
+    // Winners
+    match /winners/{winnerId} {
+      allow read, write: if true;
+    }
+
+    // Connection test document
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}

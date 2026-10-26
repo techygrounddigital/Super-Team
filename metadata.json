@@ -1,0 +1,8 @@
+{
+  "name": "Super Team Live Quiz",
+  "description": "Real-time live quiz web app for Super Team Event & Award Celebration 2026. Raising Stars, Building Leaders.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
